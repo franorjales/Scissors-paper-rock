@@ -2,6 +2,12 @@ package lottoland.Services;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
 import org.springframework.boot.test.context.SpringBootTest;
 
 import lottoland.services.GameServices;
@@ -13,11 +19,24 @@ public class GameServicesTests {
 	
 	@Test
 	public void insertANewUserThenTheNewUserWillExist() {
-		//TODO the idea is that it must exist a method that create users with differents ids and return them to the front
+		String newUser = gService.insertNewUser();
+		
+		assertTrue(gService.existUser(newUser), "The user must be created");
 	}
 	
 	@Test
 	public void insertNUsersThenCheckTheyAllHaveDifferentIds() {
+		int nUsers = 3;
+		List users = new ArrayList<String>(); 
+		
+		for(int i = 0; i < nUsers; i++) {
+			users.add(gService.insertNewUser());
+		}
+		
+		HashSet<String> distintUsers = new HashSet<String>(users);
+		
+		assertEquals(users.size(), distintUsers.size(), "there should be no different users");
+		
 	}
 
 	@Test
