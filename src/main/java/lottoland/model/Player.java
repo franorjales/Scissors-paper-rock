@@ -1,5 +1,5 @@
 package lottoland.Model;
 
-public class Game {
+public class Player {
 
 }
