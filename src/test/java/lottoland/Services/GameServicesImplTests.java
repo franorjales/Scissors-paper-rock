@@ -1,84 +1,75 @@
 package lottoland.Services;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.fail;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.assertj.core.api.Assertions.fail;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat; 
 import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.oneOf;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
 import org.springframework.boot.test.context.SpringBootTest;
-
 import lottoland.Commons.Constants;
-import lottoland.Exceptions.NoUserException;
-import lottoland.Model.Game;
-import lottoland.Model.Match;
-import lottoland.Repository.GameRepositoryImpl;
-import lottoland.Services.GameServicesImpl;
+import lottoland.Exceptions.*;
+import lottoland.Interfaces.*;
+import lottoland.Model.*;
 
 @SpringBootTest
 @TestMethodOrder(OrderAnnotation.class)
 public class GameServicesImplTests {
 	
 	@Mock
-    private static GameRepositoryImpl gRepository;
+    private static IGameRepository gRepository;
 	
 	@InjectMocks
-	private GameServicesImpl gService;
+	private IGameServices gService;
 	
-
-	private static Game testUserGame = new Game();
 	private static final String TEST_USER_NAME = "TEST_USER_NAME";
 	private static final String TEST_USER_NAME_NO_INSERTED = "TEST_USER_NAME_NO_INSERTED";
 	private static final String RESTART_TEST_USER_NAME = "RESTART_TEST_USER_NAME";
-	private static final String TEST_USER_NAME_ONE_MATCH = "TEST_USER_NAME_ONE_MATCH";
-
-	/* TODO
-	 *
-	 *
-	 *	Beans -> Game 
-	 *		  -> Match
-	 *		  -> Player
-	 *
-	 *	GameServiceImplementation methods -> playMatch(user)
-	 *									  -> playMatch(user, playerOneValue)
-	 *									  -> restartUser()
-	*/
-	
+	private static IGame testUserGame = new Game(TEST_USER_NAME);
 	
 	@BeforeAll
-	public static void setMockOutput() {
+	public static void setMockOutput() throws NoGameFoundException {
 		
 		int numberOfMatchesForNMatchesTest = 3;
 		
 		for(int i= 0; i < numberOfMatchesForNMatchesTest; i++) {
-			testUserGame.addMatch(new Match());
+			testUserGame.addMatch(new Match(Constants.SCISSORS_VALUE, Constants.ROCK_VALUE, Constants.WINNER_PLAYER_TWO_ID));
 		}
 
-        when(gRepository.checkUser(not(is(oneOf(TEST_USER_NAME, RESTART_TEST_USER_NAME)))).thenAnswer(false));
-        when(gRepository.checkUser(isNull())).thenReturn(false);
-        when(gRepository.checkUser(eq(TEST_USER_NAME)).thenReturn(true));
-        when(gRepository.checkUser(eq(RESTART_TEST_USER_NAME)).thenReturn(true));
-        when(gRepository.addNewGame(eq(TEST_USER_NAME_NO_INSERTED)).thenReturn(new Game(TEST_USER_NAME_NO_INSERTED)));
-        when(gRepository.updateGame(any(Game.class))).thenAnswer(i -> i.getArgumentAt(0, Game.class).getUser().equals(TEST_USER_NAME) ? testUserGame : i.getArgumentAt(0, Game.class));
-        when(gRepository.getGame(eq(TEST_USER_NAME)).thenReturn(new Game(TEST_USER_NAME)));
+        when(gRepository.checkUser(anyString())).thenAnswer(new Answer<Boolean>() {
+
+			@Override
+			public Boolean answer(InvocationOnMock invocation) throws Throwable {
+			    Boolean result=false;
+			    
+			    String argument = (String)invocation.getArgument(0);
+			    
+			    if(argument == null) {
+			    	return false;
+			    }
+			    
+			    switch (argument) {
+			        case "TEST_USER_NAME":
+			        case "RESTART_TEST_USER_NAME":
+			            result = true; 
+			            break;
+			        default:
+			            result = false;
+			            break;
+			    }
+			    return result;
+			}
+        });
+        when(gRepository.addNewGame()).thenReturn(new Game(TEST_USER_NAME_NO_INSERTED));
+		when(gRepository.getGame(eq(TEST_USER_NAME))).thenReturn(new Game(TEST_USER_NAME));
 
 	}
 		
@@ -86,7 +77,17 @@ public class GameServicesImplTests {
 	@Order(1)
 	public void playGameForNoInsertedUserThenItMustBeReturnedANewGameWithOneMatchPlayedAndTheUserID() {
 		int one = 1;
-		Game testGame = gService.playMatch(TEST_USER_NAME_NO_INSERTED);
+		IGame testGame = null;
+		try {
+			testGame = gService.playMatch(TEST_USER_NAME_NO_INSERTED);
+		} catch (NoGameFoundException e) {
+			fail("An exception has occurred playing a match");
+		}
+		
+		if(testGame == null) {
+			fail("The method playMatch() must return a game");
+		}
+		
 		assertEquals(one, testGame.getNumberOfmatchesPlayeds(),"There must be one played matches");
 		assertThat("There must be an user setted in the game", testGame.getUser(), is(not(emptyOrNullString())));
 	}
@@ -95,38 +96,56 @@ public class GameServicesImplTests {
 	@Order(2)
     public void doARestartThenZeroResultsShouldBeReturned() {
 		int zero = 0;
-		assertEquals(zero, gService.restartUserGame(RESTART_TEST_USER_NAME).getNumberOfmatchesPlayeds(),"There must be zero played matches");
+		try {
+			assertEquals(zero, gService.restartUserGame(RESTART_TEST_USER_NAME).getNumberOfmatchesPlayeds(),"There must be zero played matches");
+		} catch (NoUserException e) {
+			fail("An exception has occurred restarting a user game");
+		}
 	}
 	
 	@Test
 	@Order(3)
     public void doARestartWithAnInvalidUserThenNoUserExceptionShouldBeThrown() {
-		int zero = 0;
-		NoUserException e = assertThrows(NoUserException.class, gService.restartUserGame(null), "There must be an exception passing a null user to the restart game function");
-
-		assertEquals(Constants.NO_USER_EXCEPTION_MESSAGE, e.getMessage(), "The message must be: "+ Constants.NO_USER_EXCEPTION_MESSAGE)
-		assertEquals(zero, gService.restartUserGame(null).getNumberOfmatchesPlayeds(),"There must be zero played matches");
+		NoUserException e = assertThrows(NoUserException.class, () -> gService.restartUserGame(null), "There must be an exception passing a null user to the restart game function");
+		assertEquals(Constants.NO_USER_EXCEPTION_MESSAGE, e.getMessage(), "The message must be: "+ Constants.NO_USER_EXCEPTION_MESSAGE);
 	}
 	
 	@Test
 	@Order(4)
     public void playAGameThenItMustReturnOneRecordWithPlayerOneChoosePlayerTwoChooseAndTheResultOfTheMatch() {
 		int numberOfMatches = 1;
-		Game userGame = gService.playMatch(TEST_USER_NAME_NO_INSERTED, Constants.SCISSORS_VALUE);
+		IGame userGame = null;
+		try {
+			userGame = gService.playMatch(TEST_USER_NAME_NO_INSERTED, Constants.SCISSORS_VALUE);
+		} catch (NoGameFoundException e) {
+			fail("An exception has occurred playing a match");
+		}
+		
+		if(userGame == null) {
+			fail("The method playMatch() must return a game");
+		}
 		
 		assertEquals(numberOfMatches, userGame.getNumberOfmatchesPlayeds(),"There must be " + numberOfMatches + " matches already played");
-		assertEquals(Constants.SCISSORS_VALUE, userGame.getMatchsInfo.get(0).getPlayerOneChoose(),"The player one choose must be scissors");
-		assertEquals(Constants.ROCK_VALUE, userGame.getMatchsInfo.get(0).getPlayerTwoChoose(),"The player two choose must be rock");
-		assertEquals(Constants.WINNER_PLAYER_TWO_ID, userGame.getMatchsInfo.get(0).getWinner,"The winner must be player two");		
+		assertEquals(Constants.SCISSORS_VALUE, userGame.getMatches().get(0).getPlayerOneChoose(),"The player one choose must be scissors");
+		assertEquals(Constants.ROCK_VALUE, userGame.getMatches().get(0).getPlayerTwoChoose(),"The player two choose must be rock");
+		assertEquals(Constants.WINNER_PLAYER_TWO_ID, userGame.getMatches().get(0).getWinner(),"The winner must be player two");		
 	}
 	
 	@Test
 	@Order(5)
     public void playingNMatchesThenNMatchesMustBeReturned() {
-		int numberOfMatches = testUserGame.getMatches().size();
-		Game userGame = new Game();
+		int numberOfMatches = testUserGame.getNumberOfmatchesPlayeds();
+		IGame userGame = null;
 		for(int i = 0; i < numberOfMatches; i++) {
-			userGame = gService.playMatch(TEST_USER_NAME);
+			try {
+				userGame = gService.playMatch(TEST_USER_NAME);
+			} catch (NoGameFoundException e) {
+				fail("An exception has occurred playing a match");
+			}
+		}
+		
+		if(userGame == null) {
+			fail("The method playMatch() must return a game");
 		}
 		
 		assertEquals(numberOfMatches, userGame.getNumberOfmatchesPlayeds(),"There must be " + numberOfMatches + " matches already played");

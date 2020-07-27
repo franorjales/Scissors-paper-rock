@@ -1,31 +1,20 @@
 package lottoland.Repository;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.oneOf;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.AdditionalMatchers.not;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
 
 import lottoland.Commons.Constants;
 import lottoland.Exceptions.NoGameFoundException;
-import lottoland.Model.Game;
+import lottoland.Interfaces.IGame;
+import lottoland.Interfaces.IGameRepository;
+import lottoland.Interfaces.IMatch;
 import lottoland.Model.Match;
 import lottoland.Repository.GameRepositoryImpl;
 
 public class GameRepositoryImplTests {
 	
-    private GameRepositoryImpl gRepository;
+    private IGameRepository gRepository;
     
 	@BeforeEach
 	public void prepareTests() {
@@ -36,30 +25,43 @@ public class GameRepositoryImplTests {
 	@Order(1)
 	public void addNewGameThenTheNewGameShouldExist() {
 		int zero = 0;
-		Game newGame = this.gRepository.addNewGame();
+		IGame newGame = this.gRepository.addNewGame();
 		
 		assertEquals(zero, newGame.getNumberOfmatchesPlayeds(),"There must be zero played matches in a new game");
-		assertEquals(newGame.getUser(), this.gRepository.getGame(newGame.getUser()).getUser(),"The game previously created must exist in the BBDD");
+		try {
+			assertEquals(newGame.getUser(), this.gRepository.getGame(newGame.getUser()).getUser(),"The game previously created must exist in the BBDD");
+		} catch (NoGameFoundException e) {
+			fail("An exception has occurred retrieving the inserted game");
+		}
 
 	}
 	
 	@Test
 	@Order(2)
 	public void updateAGameThenTheGameShouldBeSavedUpdated() {
-		Game gameTest = this.gRepository.addNewGame();
-		Match newMatch = new Match();
-		
-		newMatch.setPlayerOneChoose(Constants.SCISSORS_VALUE);
-		newMatch.setPlayerTwoChoose(Constants.ROCK_VALUE);
-		newMatch.setWinner(Constants.WINNER_PLAYER_TWO_ID);
+		IGame gameTest = this.gRepository.addNewGame();
+		IMatch newMatch = new Match(Constants.SCISSORS_VALUE, Constants.ROCK_VALUE , Constants.WINNER_PLAYER_TWO_ID);
 		
 		gameTest.addMatch(newMatch);
 		
-		Game updatedGame = this.gRepository.updateGame(gameTest);
+		this.gRepository.updateGame(gameTest);
 		
-		assertEquals(gameTest.getMatchsInfo.get(0).getPlayerOneChoose(), updatedGame.getMatchsInfo.get(0).getPlayerOneChoose(),"The player one choose must be the same in both games");
-		assertEquals(gameTest.getMatchsInfo.get(0).getPlayerTwoChoose(), updatedGame.getMatchsInfo.get(0).getPlayerTwoChoose(),"The player two choose must be the same in both games");
-		assertEquals(gameTest.getMatchsInfo.get(0).getWinner, updatedGame.getMatchsInfo.get(0).getWinner,"The winner must be the same in both players");	
+		IGame updatedGame = null;
+		try {
+			updatedGame = this.gRepository.getGame(gameTest.getUser());
+		} catch (NoGameFoundException e) {
+			// TODO Auto-generated catch block
+			fail("An exception has occurred retrieving the inserted game");
+		}
+		
+		if(updatedGame == null) {
+			fail("The inserted game cannot be null");
+
+		}
+		
+		assertEquals(gameTest.getMatches().get(0).getPlayerOneChoose(), updatedGame.getMatches().get(0).getPlayerOneChoose(),"The player one choose must be the same in both games");
+		assertEquals(gameTest.getMatches().get(0).getPlayerTwoChoose(), updatedGame.getMatches().get(0).getPlayerTwoChoose(),"The player two choose must be the same in both games");
+		assertEquals(gameTest.getMatches().get(0).getWinner(), updatedGame.getMatches().get(0).getWinner(),"The winner must be the same in both players");	
 
 	}
 	
@@ -75,7 +77,7 @@ public class GameRepositoryImplTests {
 	@Test
 	@Order(4)
 	public void createANewUserAndCheckIfExistThenItMustReturnTrue() {
-		Game gameTest = this.gRepository.addNewGame();
+		IGame gameTest = this.gRepository.addNewGame();
 		boolean userExist = this.gRepository.checkUser(gameTest.getUser());
 		
 		assertTrue(userExist, "The user should exist");
@@ -96,17 +98,23 @@ public class GameRepositoryImplTests {
 	@Test
 	@Order(4)
 	public void CheckIfExistACreatedGameThenItMustReturnTheGame() {
-		Game gameTest = this.gRepository.addNewGame();
-		Game gameFounded = this.gRepository.getGame(gameTest.getUser());
+		IGame gameTest = this.gRepository.addNewGame();
+		IGame gameFounded;
+		try {
+			gameFounded = this.gRepository.getGame(gameTest.getUser());
+			assertEquals(gameTest.getUser(), gameFounded.getUser(),"Both games should have the same user");	
+		} catch (NoGameFoundException e) {
+			fail("Exception thrown when retrieve an existing game");
+		}
 		
-		assertEquals(gameTest.getUser(), gameFounded.getUser(),"Both games should have the same user");	
+		
 	}
 	
 	@Test
 	@Order(5)
-	public void CheckIfExistANONCreatedGameThenAnExceptionMustBeThrown() {
+	public void CheckIfExistANonCreatedGameThenAnExceptionMustBeThrown() {
 		
-		NoGameFoundException e = assertThrows(NoGameFoundException.class, this.gRepository.getGame(null), "There must be an exception passing a null user to the get game function");
+		NoGameFoundException e = assertThrows(NoGameFoundException.class,() -> this.gRepository.getGame(null), "There must be an exception passing a null user to the get game function");
 		assertEquals(Constants.NO_GAME_FOUND_EXCEPTION_MESSAGE, e.getMessage(), "The message must be: "+ Constants.NO_GAME_FOUND_EXCEPTION_MESSAGE);
 
 	}

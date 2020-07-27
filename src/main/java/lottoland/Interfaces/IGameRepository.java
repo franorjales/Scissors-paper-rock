@@ -1,11 +1,11 @@
 package lottoland.Interfaces;
 
-import lottoland.Model.Game;
+import lottoland.Exceptions.NoGameFoundException;
 
 public interface IGameRepository {
-	public Game addNewGame();
-	public Game updateGame(Game game);
-	public boolean checkUser(String user);
-	public Game getGame(String user);
+	public IGame addNewGame();
+	public void updateGame(IGame game);
+	public Boolean checkUser(String user);
+	public IGame getGame (String user) throws NoGameFoundException;
 	public String generateRandomString();
 }
