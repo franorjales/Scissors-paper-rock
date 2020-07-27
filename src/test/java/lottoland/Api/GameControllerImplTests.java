@@ -31,6 +31,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.hasSize;
 
+import lottoland.Commons.Constants;
 import lottoland.Exceptions.NoUserException;
 import lottoland.Model.Game;
 import lottoland.Model.Match;
@@ -91,7 +92,7 @@ public class GameControllerImplTests {
 		
 		Game testGame = objectMapper.readValue(result, Game.class);
 		
-		assertThat("A game with user of "+ Integer.toString(Constants.USER_ID_LENGTH)+"  must be returned",testGame.getUser(), hasSize(Constants.USER_ID_LENGTH));
+		assertThat("A game with user of "+ Integer.toString(Constants.USER_ID_LENGTH)+"  must be returned", testGame.getUser(), hasSize(Constants.USER_ID_LENGTH));
 
 	}
 	
@@ -122,8 +123,8 @@ public class GameControllerImplTests {
 			      .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 		
 		NoUserException e = objectMapper.readValue(result, NoUserException.class);
-
-		assertThat(e, "The message must be: "+ Constants.NO_USER_EXCEPTION_MESSAGE).hasMessageThat().contains(Constants.NO_USER_EXCEPTION_MESSAGE);
+		
+		assertEquals(Constants.NO_USER_EXCEPTION_MESSAGE, e.getMessage(), "The message must be: "+ Constants.NO_USER_EXCEPTION_MESSAGE);
 
 	}
 	

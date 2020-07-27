@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lottoland.Commons.Constants;
 import lottoland.Exceptions.NoGameFoundException;
 import lottoland.Model.Game;
 import lottoland.Model.Match;
@@ -25,9 +26,6 @@ import lottoland.Repository.GameRepositoryImpl;
 public class GameRepositoryImplTests {
 	
     private GameRepositoryImpl gRepository;
-
-	//TODO Constants -> USER_ID_LENGTH
-    
     
 	@BeforeEach
 	public void prepareTests() {
@@ -109,7 +107,8 @@ public class GameRepositoryImplTests {
 	public void CheckIfExistANONCreatedGameThenAnExceptionMustBeThrown() {
 		
 		NoGameFoundException e = assertThrows(NoGameFoundException.class, this.gRepository.getGame(null), "There must be an exception passing a null user to the get game function");
-		assertThat(e, "The message must be: "+ Constants.NO_GAME_FOUND_EXCEPTION_MESSAGE).hasMessageThat().contains(Constants.NO_GAME_FOUND_EXCEPTION_MESSAGE);
+		assertEquals(Constants.NO_GAME_FOUND_EXCEPTION_MESSAGE, e.getMessage(), "The message must be: "+ Constants.NO_GAME_FOUND_EXCEPTION_MESSAGE);
+
 	}
 	  
 	

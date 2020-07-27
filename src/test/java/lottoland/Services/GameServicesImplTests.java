@@ -26,7 +26,9 @@ import java.util.List;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
+import lottoland.Commons.Constants;
 import lottoland.Exceptions.NoUserException;
+import lottoland.Model.Game;
 import lottoland.Model.Match;
 import lottoland.Repository.GameRepositoryImpl;
 import lottoland.Services.GameServicesImpl;
@@ -49,13 +51,6 @@ public class GameServicesImplTests {
 	private static final String TEST_USER_NAME_ONE_MATCH = "TEST_USER_NAME_ONE_MATCH";
 
 	/* TODO
-	 *  Constants -> NO_USER_EXCEPTION_MESSAGE = "Does not exist a user with the given ID"
-	 *			  ->  WINNER_PLAYER_ONE_ID
-	 *			  ->  WINNER_PLAYER_TWO_ID
-	 *			  ->  DRAW_ID
-	 *			  ->  SCISSORS_VALUE
-	 *			  ->  ROCK_VALUE
-	 *			  ->  PAPER_VALUE
 	 *
 	 *
 	 *	Beans -> Game 
@@ -91,9 +86,9 @@ public class GameServicesImplTests {
 	@Order(1)
 	public void playGameForNoInsertedUserThenItMustBeReturnedANewGameWithOneMatchPlayedAndTheUserID() {
 		int one = 1;
-		Game g = gService.playMatch(TEST_USER_NAME_NO_INSERTED);
-		assertEquals(one, g.getNumberOfmatchesPlayeds(),"There must be one played matches");
-		assertThat(g, is(not(emptyOrNullString())), "There must be an user setted in the game");
+		Game testGame = gService.playMatch(TEST_USER_NAME_NO_INSERTED);
+		assertEquals(one, testGame.getNumberOfmatchesPlayeds(),"There must be one played matches");
+		assertThat("There must be an user setted in the game", testGame.getUser(), is(not(emptyOrNullString())));
 	}
 	
 	@Test
@@ -109,7 +104,7 @@ public class GameServicesImplTests {
 		int zero = 0;
 		NoUserException e = assertThrows(NoUserException.class, gService.restartUserGame(null), "There must be an exception passing a null user to the restart game function");
 
-		assertThat(e, "The message must be: "+ Constants.NO_USER_EXCEPTION_MESSAGE).hasMessageThat().contains(Constants.NO_USER_EXCEPTION_MESSAGE);
+		assertEquals(Constants.NO_USER_EXCEPTION_MESSAGE, e.getMessage(), "The message must be: "+ Constants.NO_USER_EXCEPTION_MESSAGE)
 		assertEquals(zero, gService.restartUserGame(null).getNumberOfmatchesPlayeds(),"There must be zero played matches");
 	}
 	
@@ -117,7 +112,7 @@ public class GameServicesImplTests {
 	@Order(4)
     public void playAGameThenItMustReturnOneRecordWithPlayerOneChoosePlayerTwoChooseAndTheResultOfTheMatch() {
 		int numberOfMatches = 1;
-		Game userGame = gService.playMatch(TEST_USER_NAME_NO_INSERTED, SCISSORS_VALUE);
+		Game userGame = gService.playMatch(TEST_USER_NAME_NO_INSERTED, Constants.SCISSORS_VALUE);
 		
 		assertEquals(numberOfMatches, userGame.getNumberOfmatchesPlayeds(),"There must be " + numberOfMatches + " matches already played");
 		assertEquals(Constants.SCISSORS_VALUE, userGame.getMatchsInfo.get(0).getPlayerOneChoose(),"The player one choose must be scissors");
@@ -150,7 +145,7 @@ public class GameServicesImplTests {
 	@Order(7)
     public void givenRockforPlayerOneThenItsDraw() {
 				
-		assertEquals(Constants.DRAW_ID, gService.calculateMatch(Constants.ROCK_VALUE, Constants.ROCK_VALUE).getWinner(),"It must be a draw");
+		assertEquals(Constants.DRAW_VALUE, gService.calculateMatch(Constants.ROCK_VALUE, Constants.ROCK_VALUE).getWinner(),"It must be a draw");
 	}
 	
 	@Test
