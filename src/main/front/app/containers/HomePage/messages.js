@@ -10,6 +10,6 @@ export const scope = 'app.containers.HomePage';
 export default defineMessages({
   header: {
     id: `${scope}.header`,
-    defaultMessage: 'Frontal en React Redux-Saga!',
+    defaultMessage: 'This is the HomePage container!',
   },
 });
