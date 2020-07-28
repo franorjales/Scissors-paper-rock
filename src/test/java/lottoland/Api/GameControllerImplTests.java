@@ -4,7 +4,6 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.io.UnsupportedEncodingException;
@@ -12,54 +11,62 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.assertj.core.api.Assertions.fail;
+import static org.hamcrest.CoreMatchers.containsString;
+
 import lottoland.Commons.Constants;
 import lottoland.Exceptions.*;
-import lottoland.Interfaces.IGameController;
+import lottoland.Interfaces.IGameServices;
 import lottoland.Model.*;
-import lottoland.Services.GameServicesImpl;
+import lottoland.Portal.PortalApplication;
 
-@SpringBootTest
 @TestMethodOrder(OrderAnnotation.class)
+@SpringBootTest(classes = PortalApplication.class)
+@AutoConfigureMockMvc
 public class GameControllerImplTests {
+
 	
 	@Autowired
 	private ObjectMapper objectMapper;
 	
     @Autowired
 	private MockMvc mvc;
+    
+    @Mock
+    private IGameServices gService;
+    
+    @InjectMocks
+    private GameControllerImpl gController;
 
-	@Mock
-    private static GameServicesImpl gService;
-	
-	@InjectMocks
-	private IGameController gController;
-	
 	private static final String TEST_USER_NAME = "TEST_USER_NAME";
-	
-	@BeforeAll
-	public static void setMockOutput() throws NoUserException, NoGameFoundException {
+	private static final String TEST_USER_NAME_NO_INSERTED = "TEST_USER_NAME_NO_INSERTED";
 
-        when(gService.playMatch(anyString())).thenAnswer(i -> new Game(i.getArgument(0)));
-        when(gService.playMatch(isNull())).thenReturn(new Game(TEST_USER_NAME));
-        when(gService.restartUserGame(TEST_USER_NAME)).thenReturn(new Game(TEST_USER_NAME));
-        when(gService.restartUserGame(not(eq(TEST_USER_NAME)))).thenThrow(new NoUserException(Constants.NO_USER_EXCEPTION_MESSAGE));
-
-	}
 	
+    @BeforeEach
+    public void setup() {
+
+        MockitoAnnotations.initMocks(this);
+
+        this.mvc = MockMvcBuilders.standaloneSetup(gController).build();
+
+    }
+		
 	@Test
 	@Order(1)
 	public void playMatchWithUserThenMustBeReturnedAGame() {
-		
 		String result = null;
 		try {
+	        doReturn(new Game(TEST_USER_NAME)).when(gService).playMatch(anyString());
 			result = mvc.perform(get("/api/playMatch")
 				      .contentType(MediaType.APPLICATION_JSON)
 				      .param("user", TEST_USER_NAME))
@@ -67,7 +74,7 @@ public class GameControllerImplTests {
 		} catch (UnsupportedEncodingException e) {
 			fail("There has been an UnsupportedEncodingException sending the request");
 		} catch (Exception e) {
-			fail("There has been an Exception sending the request");
+			fail("There has been an Exception sending the request" );
 
 		}
 		
@@ -79,7 +86,7 @@ public class GameControllerImplTests {
 		try {
 			testGame = objectMapper.readValue(result, GameDTO.class);
 		} catch (JsonProcessingException e) {
-			fail("There has been an Exception parsing the response ");
+			fail("There has been an Exception parsing the response: " + result + " ///// " +e.getMessage());
 		}
 		
 		if(testGame == null) {
@@ -96,12 +103,13 @@ public class GameControllerImplTests {
 
 		String result = null;
 		try {
+	        when(gService.playMatch(isNull())).thenReturn(new Game(TEST_USER_NAME));
 			result = mvc.perform(get("/api/playMatch")
-				      .contentType(MediaType.APPLICATION_JSON)
-				      .param("user", "null"))
+				      .contentType(MediaType.APPLICATION_JSON))
 				      .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 		} catch (Exception e) {
-			fail("There has been an Exception sending the request");
+			e.getStackTrace();
+			fail("There has been an Exception sending the request" + e.getMessage());
 		}
 		
 		if(result == null) {
@@ -112,14 +120,14 @@ public class GameControllerImplTests {
 		try {
 			testGame = objectMapper.readValue(result, GameDTO.class);
 		} catch (JsonProcessingException e) {
-			fail("There has been an Exception parsing the response ");
+			fail("There has been an Exception parsing the response " + result);
 		}
 		
 		if(testGame == null) {
 			fail("The mapper function must return a game, not null ");
 		}
 
-		assertEquals(Constants.USER_ID_LENGTH, testGame.getUser().length(), "A game with user of "+ Integer.toString(Constants.USER_ID_LENGTH)+"  must be returned");
+		assertEquals(TEST_USER_NAME, testGame.getUser(), "A game with user must be returned " + testGame.getUser());
 
 	}
 	
@@ -131,6 +139,7 @@ public class GameControllerImplTests {
 		
 		String result = null;
 		try {
+	        when(gService.restartUserGame(TEST_USER_NAME)).thenReturn(new Game(TEST_USER_NAME));
 			result = mvc.perform(get("/api/restartGame")
 				      .contentType(MediaType.APPLICATION_JSON)
 				      .param("user", TEST_USER_NAME))
@@ -162,21 +171,16 @@ public class GameControllerImplTests {
 	@Order(4)
 	public void restartANotInsertedUserGameThenAnExceptionMustBeThrown() {
 		
-		String result = null;
 		try {
-			result = mvc.perform(get("/api/restartGame")
+	        when(gService.restartUserGame(eq(TEST_USER_NAME_NO_INSERTED))).thenThrow(new NoUserException(Constants.NO_USER_EXCEPTION_MESSAGE));
+			mvc.perform(get("/api/restartGame")
 				      .contentType(MediaType.APPLICATION_JSON)
-				      .content("user='null'"))
-				      .andExpect(status().isNotFound()).andReturn().getResponse().getContentAsString();
+				      .param("user", TEST_USER_NAME_NO_INSERTED))
+				      .andExpect(status().isNotFound())
+				      .andExpect(status().reason(Constants.NO_USER_EXCEPTION_MESSAGE));
 		} catch (Exception e1) {
 			fail("There has been an Exception sending the request");
 		}
-		
-		if(result == null) {
-			fail("The mvc request should return an exception, not null");
-		}
-		
-		assertEquals(Constants.NO_USER_EXCEPTION_MESSAGE, result, "The message must be: "+ Constants.NO_USER_EXCEPTION_MESSAGE);
 
 	}
 	

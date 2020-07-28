@@ -3,6 +3,7 @@ package lottoland.Repository;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import lottoland.Commons.Constants;
 import lottoland.Exceptions.NoGameFoundException;
@@ -10,8 +11,10 @@ import lottoland.Interfaces.IGame;
 import lottoland.Interfaces.IGameRepository;
 import lottoland.Interfaces.IMatch;
 import lottoland.Model.Match;
+import lottoland.Portal.PortalApplication;
 import lottoland.Repository.GameRepositoryImpl;
 
+@SpringBootTest(classes = PortalApplication.class)
 public class GameRepositoryImplTests {
 	
     private IGameRepository gRepository;

@@ -1,9 +1,7 @@
 package lottoland.Services;
 
 import java.util.concurrent.ThreadLocalRandom;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import lottoland.Commons.Constants;
 import lottoland.Exceptions.NoGameFoundException;
 import lottoland.Exceptions.NoUserException;
@@ -16,11 +14,11 @@ import lottoland.Model.Match;
 import lottoland.Repository.GameRepositoryImpl;
 
 public class GameServicesImpl implements IGameServices{
-	
+
 	private IGameRepository gRepository;
 	
 	@Autowired
-	public GameServicesImpl(GameRepositoryImpl gRepository) {
+	public GameServicesImpl(IGameRepository gRepository) {
 		this.gRepository = gRepository;
 	}
 

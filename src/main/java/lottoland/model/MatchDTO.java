@@ -8,6 +8,8 @@ public class MatchDTO {
 	private int playerTwoChoose;
 	private int winner;
 	
+	public MatchDTO() {}
+	
 	public MatchDTO(int playerOneChoose, int playerTwoChoose, int winner) {
 		this.playerOneChoose = playerOneChoose;
 		this.playerTwoChoose = playerTwoChoose;
@@ -32,6 +34,27 @@ public class MatchDTO {
 	public int getWinner() {
 		return this.winner;
 
+	}
+
+	/**
+	 * @param playerOneChoose the playerOneChoose to set
+	 */
+	public void setPlayerOneChoose(int playerOneChoose) {
+		this.playerOneChoose = playerOneChoose;
+	}
+
+	/**
+	 * @param playerTwoChoose the playerTwoChoose to set
+	 */
+	public void setPlayerTwoChoose(int playerTwoChoose) {
+		this.playerTwoChoose = playerTwoChoose;
+	}
+
+	/**
+	 * @param winner the winner to set
+	 */
+	public void setWinner(int winner) {
+		this.winner = winner;
 	}
 
 }

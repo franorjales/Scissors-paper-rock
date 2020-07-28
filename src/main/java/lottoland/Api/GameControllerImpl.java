@@ -11,21 +11,20 @@ import lottoland.Interfaces.IGame;
 import lottoland.Interfaces.IGameController;
 import lottoland.Interfaces.IGameServices;
 import lottoland.Model.GameDTO;
-import lottoland.Services.GameServicesImpl;
 
 @RestController
 public class GameControllerImpl implements IGameController{
-
-    private IGameServices gService;
+	
+    private IGameServices gService; 
 	
     @Autowired
-	public GameControllerImpl(GameServicesImpl gService){
+	public GameControllerImpl(IGameServices gService) {
 		this.gService = gService;
 	}
-	
+		
 	@Override
 	@GetMapping("/api/playMatch")
-	public GameDTO playMatch(@RequestParam(value = "user")String user) throws NoGameFoundException {
+	public GameDTO playMatch(@RequestParam(required = false)String user) throws NoGameFoundException {
 		
 		IGame game = this.gService.playMatch(user);
 		
@@ -36,7 +35,7 @@ public class GameControllerImpl implements IGameController{
 
 	@Override
 	@GetMapping("/api/restartGame")
-	public GameDTO restartUserGame(@RequestParam(value = "user")String user) throws NoUserException {
+	public GameDTO restartUserGame(@RequestParam(required = true)String user) throws NoUserException {
 		IGame game = this.gService.restartUserGame(user);
 		
 		GameDTO gameDto = new GameDTO(game);
