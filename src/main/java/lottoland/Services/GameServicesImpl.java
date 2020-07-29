@@ -1,5 +1,6 @@
 package lottoland.Services;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import lottoland.Commons.Constants;
@@ -77,5 +78,12 @@ public class GameServicesImpl implements IGameServices{
 		return new Match(playerOneChoose, playerTwoChoose, winner);
 
 	}
+
+	@Override
+	public List<IGame> getHistoricalGames() {
+		return this.gRepository.getHistoricalGames();
+	}
+	
+	
 
 }

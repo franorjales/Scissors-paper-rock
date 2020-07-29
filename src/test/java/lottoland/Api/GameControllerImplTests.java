@@ -2,7 +2,6 @@ package lottoland.Api;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -24,7 +23,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.assertj.core.api.Assertions.fail;
-import static org.hamcrest.CoreMatchers.containsString;
 
 import lottoland.Commons.Constants;
 import lottoland.Exceptions.*;
@@ -196,7 +194,6 @@ public class GameControllerImplTests {
 	        when(gService.getHistoricalGames()).thenReturn(new ArrayList<IGame>());
 	        result = mvc.perform(get("/api/getHistoricalGames")
 				      .contentType(MediaType.APPLICATION_JSON))
-				      .andExpect(status().isOk())
 				      .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 		} catch (Exception e) {
 			fail("There has been an Exception sending the request");

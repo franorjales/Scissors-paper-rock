@@ -1,5 +1,7 @@
 package lottoland.Api;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,6 +13,7 @@ import lottoland.Interfaces.IGame;
 import lottoland.Interfaces.IGameController;
 import lottoland.Interfaces.IGameServices;
 import lottoland.Model.GameDTO;
+import lottoland.Model.HistoricalGamesDTO;
 
 @RestController
 public class GameControllerImpl implements IGameController{
@@ -41,6 +44,16 @@ public class GameControllerImpl implements IGameController{
 		GameDTO gameDto = new GameDTO(game);
 
 		return gameDto;
+	}
+	
+	@Override
+	@GetMapping("/api/getHistoricalGames")
+	public HistoricalGamesDTO getHistoricalGames() {
+		List<IGame> historicalGames = this.gService.getHistoricalGames();
+		
+		HistoricalGamesDTO historicalGamesDto = new HistoricalGamesDTO(historicalGames);
+
+		return historicalGamesDto;
 	}
 
 }
