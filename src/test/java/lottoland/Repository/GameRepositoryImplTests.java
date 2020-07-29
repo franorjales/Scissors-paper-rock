@@ -2,6 +2,9 @@ package lottoland.Repository;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -10,6 +13,7 @@ import lottoland.Exceptions.NoGameFoundException;
 import lottoland.Interfaces.IGame;
 import lottoland.Interfaces.IGameRepository;
 import lottoland.Interfaces.IMatch;
+import lottoland.Model.Game;
 import lottoland.Model.Match;
 import lottoland.Portal.PortalApplication;
 import lottoland.Repository.GameRepositoryImpl;
@@ -18,6 +22,8 @@ import lottoland.Repository.GameRepositoryImpl;
 public class GameRepositoryImplTests {
 	
     private IGameRepository gRepository;
+    
+	private static final String TEST_USER_NAME = "TEST_USER_NAME";
     
 	@BeforeEach
 	public void prepareTests() {
@@ -88,7 +94,7 @@ public class GameRepositoryImplTests {
 	
 	@Test
 	@Order(4)
-	public void CheckIfExistANonInsertedUserOrNullThenItMustReturnFalse() {
+	public void checkIfExistANonInsertedUserOrNullThenItMustReturnFalse() {
 		
 		boolean userExist = this.gRepository.checkUser("");
 		boolean userExistNull = this.gRepository.checkUser(null);
@@ -100,7 +106,7 @@ public class GameRepositoryImplTests {
 	
 	@Test
 	@Order(4)
-	public void CheckIfExistACreatedGameThenItMustReturnTheGame() {
+	public void checkIfExistACreatedGameThenItMustReturnTheGame() {
 		IGame gameTest = this.gRepository.addNewGame();
 		IGame gameFounded;
 		try {
@@ -115,12 +121,31 @@ public class GameRepositoryImplTests {
 	
 	@Test
 	@Order(5)
-	public void CheckIfExistANonCreatedGameThenAnExceptionMustBeThrown() {
+	public void checkIfExistANonCreatedGameThenAnExceptionMustBeThrown() {
 		
 		NoGameFoundException e = assertThrows(NoGameFoundException.class,() -> this.gRepository.getGame(null), "There must be an exception passing a null user to the get game function");
 		assertEquals(Constants.NO_GAME_FOUND_EXCEPTION_MESSAGE, e.getMessage(), "The message must be: "+ Constants.NO_GAME_FOUND_EXCEPTION_MESSAGE);
 
 	}
 	  
+	@Test
+	@Order(6)
+	public void addANewHistoricalRecordThenCheckIfItExist() {
+		
+		IGame newGame = new Game(TEST_USER_NAME);
+		
+		this.gRepository.addHistoricalGame(newGame);
+		
+		List<IGame> historicalGameDB = this.gRepository.getHistoricalGameDB();
+		
+		IGame insertedGame = historicalGameDB.stream()
+				  .filter(game -> newGame.getUser().equals(game.getUser()))
+				  .findAny()
+				  .orElse(null);
+		
+		if(insertedGame == null) {
+			fail("The new historical game must be saved");
+		}
+	}
 	
 }

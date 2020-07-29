@@ -5,10 +5,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
 import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import static org.hamcrest.CoreMatchers.not;
@@ -17,8 +20,6 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat; 
 import static org.hamcrest.Matchers.emptyOrNullString;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import lottoland.Commons.Constants;
@@ -169,6 +170,36 @@ public class GameServicesImplTests {
 		assertEquals(Constants.WINNER_PLAYER_ONE_ID, gService.calculateMatch(Constants.PAPER_VALUE, Constants.ROCK_VALUE).getWinner(),"Player one must wins");
 	}
 	
-
-
+	@Test
+	@Order(9)
+    public void playANewGameThenCheckIfItExistInTheHistoricalRecord() {
+		
+		IGame playedGame = new Game(TEST_USER_NAME);
+		when(gRepository.getGame(anyString())).thenReturn(playedGame);
+		
+		IGame userGame = null;
+		
+		try {
+			userGame = gService.playMatch(TEST_USER_NAME);
+		} catch (NoGameFoundException e) {
+			fail("An exception has occurred playing a match");
+		}
+		
+		if(userGame == null) {
+			fail("The method playMatch() must return a game");
+		}
+		
+		when(gRepository.getHistoricalGameDB()).thenReturn(Stream.of(userGame).collect(Collectors.toList()));
+		
+		List<IGame> historicalGameDB = gService.getHistoricalGames();
+		 
+		IGame insertedGame = historicalGameDB.stream()
+				  .filter(game -> userGame.getUser().equals(game.getUser()))
+				  .findAny()
+				  .orElse(null);
+		
+		if(insertedGame == null) {
+			fail("The new historical game must be retrieved");
+		}
+	}
 }

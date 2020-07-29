@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.mockito.InjectMocks;
@@ -26,6 +28,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 
 import lottoland.Commons.Constants;
 import lottoland.Exceptions.*;
+import lottoland.Interfaces.IGame;
 import lottoland.Interfaces.IGameServices;
 import lottoland.Model.*;
 import lottoland.Portal.PortalApplication;
@@ -178,10 +181,38 @@ public class GameControllerImplTests {
 				      .param("user", TEST_USER_NAME_NO_INSERTED))
 				      .andExpect(status().isNotFound())
 				      .andExpect(status().reason(Constants.NO_USER_EXCEPTION_MESSAGE));
-		} catch (Exception e1) {
+		} catch (Exception e) {
 			fail("There has been an Exception sending the request");
 		}
 
+	}
+	
+	@Test
+	@Order(5)
+	public void getHistoricalGamesThenAGameListMustBeReturned() {
+		
+		String result = null;
+		try {
+	        when(gService.getHistoricalGames()).thenReturn(new ArrayList<IGame>());
+	        result = mvc.perform(get("/api/getHistoricalGames")
+				      .contentType(MediaType.APPLICATION_JSON))
+				      .andExpect(status().isOk())
+				      .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+		} catch (Exception e) {
+			fail("There has been an Exception sending the request");
+		}
+
+		HistoricalGamesDTO testHistoricalGames = null;
+		try {
+			testHistoricalGames = objectMapper.readValue(result, HistoricalGamesDTO.class);
+		} catch (JsonProcessingException e) {
+			fail("There has been an Exception parsing the response ");
+		}
+		
+		if(testHistoricalGames == null) {
+			fail("The mapper function must return a HistoricalGamesDTO, not null ");
+		}
+		
 	}
 	
 }
