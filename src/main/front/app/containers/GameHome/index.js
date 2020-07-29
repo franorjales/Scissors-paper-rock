@@ -30,7 +30,7 @@ import {
   matchValueWithStringForChooses,
 } from '../../utils/commonFunctions';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
   },
@@ -64,8 +64,8 @@ export function GameHome({ gameHome, playMatch, restartGame }) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {gameHome.game.matches.map((row, index) => (
-                  <TableRow key={index}>
+                {gameHome.game.matches.map(row => (
+                  <TableRow key={row.playerOneChoose}>
                     <TableCell component="th" scope="row">
                       {matchValueWithStringForChooses(row.playerOneChoose)}
                     </TableCell>
@@ -80,6 +80,9 @@ export function GameHome({ gameHome, playMatch, restartGame }) {
               </TableBody>
             </Table>
           </TableContainer>
+          <Grid item xs={12} align="center">
+            Number Of rounds played: {gameHome.game.numberOfmatchesPlayeds}
+          </Grid>
         </Grid>
       ) : (
         <Grid item xs={12} align="center">
@@ -124,7 +127,7 @@ const mapStateToProps = createStructuredSelector({
   gameHome: makeSelectGameHome(),
 });
 
-function mapDispatchToProps(dispatch) {
+export function mapDispatchToProps(dispatch) {
   return {
     playMatch: user => dispatch(playMatchAction(user)),
     restartGame: user => dispatch(restartGameAction(user)),

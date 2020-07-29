@@ -8,31 +8,37 @@
 
 import React from 'react';
 import { render } from 'react-testing-library';
+import { IntlProvider } from 'react-intl';
+import { Provider } from 'react-redux';
+import { browserHistory } from 'react-router-dom';
+import configureStore from '../../../configureStore';
+import { playMatchAction, restartGameAction } from '../actions';
+import { initialState } from '../reducer';
 // import 'jest-dom/extend-expect'; // add some helpful assertions
 
 import { GameHome } from '../index';
 
 describe('<GameHome />', () => {
-  it('Expect to not log errors in console', () => {
-    const spy = jest.spyOn(global.console, 'error');
-    const dispatch = jest.fn();
-    render(<GameHome dispatch={dispatch} />);
-    expect(spy).not.toHaveBeenCalled();
+  let store;
+
+  beforeAll(() => {
+    store = configureStore({}, browserHistory);
   });
 
-  it('Expect to have additional unit tests specified', () => {
-    expect(true).toEqual(false);
-  });
-
-  /**
-   * Unskip this test to use it
-   *
-   * @see {@link https://jestjs.io/docs/en/api#testskipname-fn}
-   */
-  it.skip('Should render and match the snapshot', () => {
+  it('should render and match the snapshot', () => {
     const {
       container: { firstChild },
-    } = render(<GameHome />);
+    } = render(
+      <Provider store={store}>
+        <IntlProvider locale="en">
+          <GameHome
+            gameHome={initialState}
+            playMatch={playMatchAction}
+            restartGame={restartGameAction}
+          />
+        </IntlProvider>
+      </Provider>,
+    );
     expect(firstChild).toMatchSnapshot();
   });
 });

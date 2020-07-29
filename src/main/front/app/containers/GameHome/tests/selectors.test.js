@@ -1,7 +1,20 @@
-// import { selectGameHomeDomain } from '../selectors';
+import { selectGameHomeDomain } from '../selectors';
 
 describe('selectGameHomeDomain', () => {
-  it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false);
+  it('should select the home state', () => {
+    const gameHomeState = {
+      game: {
+        user: null,
+        matches: [],
+        numberOfmatchesPlayeds: 0,
+      },
+      error: {
+        errorStatus: null,
+      },
+    };
+    const mockedState = {
+      home: gameHomeState,
+    };
+    expect(selectGameHomeDomain(mockedState)).toEqual(gameHomeState);
   });
 });

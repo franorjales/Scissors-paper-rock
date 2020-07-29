@@ -15,7 +15,7 @@ const selectGameHomeDomain = state => state.gameHome || initialState;
  * Default selector used by GameHome
  */
 
-const makeSelectGameHome = () =>
+export const makeSelectGameHome = () =>
   createSelector(
     selectGameHomeDomain,
     substate => substate,
