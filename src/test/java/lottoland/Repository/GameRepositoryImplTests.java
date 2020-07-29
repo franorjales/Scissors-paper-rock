@@ -130,13 +130,11 @@ public class GameRepositoryImplTests {
 	  
 	@Test
 	@Order(6)
-	public void addANewHistoricalRecordThenCheckIfItExist() {
+	public void addANewGameThenCheckIfItExistAsHistoricalRecord() {
 		
-		IGame newGame = new Game(TEST_USER_NAME);
+		IGame newGame = this.gRepository.addNewGame();
 		
-		this.gRepository.addHistoricalGame(newGame);
-		
-		List<IGame> historicalGameDB = this.gRepository.getHistoricalGameDB();
+		List<IGame> historicalGameDB = this.gRepository.getHistoricalGames();
 		
 		IGame insertedGame = historicalGameDB.stream()
 				  .filter(game -> newGame.getUser().equals(game.getUser()))
@@ -152,15 +150,13 @@ public class GameRepositoryImplTests {
 	@Order(6)
 	public void addANewHistoricalRecordThenUpdateItThenCheckIfItIsUpdated() {
 		
-		IGame newGame = new Game(TEST_USER_NAME);
-		
-		this.gRepository.addHistoricalGame(newGame);
+		IGame newGame = this.gRepository.addNewGame();
 		
 		newGame.addMatch(new Match(Constants.SCISSORS_VALUE, Constants.ROCK_VALUE, Constants.WINNER_PLAYER_TWO_ID));
 		
-		this.gRepository.updateHistoricalGame(newGame);
+		this.gRepository.updateGame(newGame);
 		
-		List<IGame> historicalGameDB = this.gRepository.getHistoricalGameDB();
+		List<IGame> historicalGameDB = this.gRepository.getHistoricalGames();
 		
 		IGame insertedGame = historicalGameDB.stream()
 				  .filter(game -> newGame.getUser().equals(game.getUser()))
