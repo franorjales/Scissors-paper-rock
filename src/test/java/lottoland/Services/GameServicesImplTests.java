@@ -172,34 +172,13 @@ public class GameServicesImplTests {
 	
 	@Test
 	@Order(9)
-    public void playANewGameThenCheckIfItExistInTheHistoricalRecord() {
+    public void getHistoricalGamesThenAListOfGamesShouldBeReturned() {
 		
-		IGame playedGame = new Game(TEST_USER_NAME);
-		when(gRepository.getGame(anyString())).thenReturn(playedGame);
+		List<IGame> historicalGames = gService.getHistoricalGames();
 		
-		IGame userGame = null;
-		
-		try {
-			userGame = gService.playMatch(TEST_USER_NAME);
-		} catch (NoGameFoundException e) {
-			fail("An exception has occurred playing a match");
-		}
-		
-		if(userGame == null) {
-			fail("The method playMatch() must return a game");
-		}
-		
-		when(gRepository.getHistoricalGameDB()).thenReturn(Stream.of(userGame).collect(Collectors.toList()));
-		
-		List<IGame> historicalGameDB = gService.getHistoricalGames();
-		 
-		IGame insertedGame = historicalGameDB.stream()
-				  .filter(game -> userGame.getUser().equals(game.getUser()))
-				  .findAny()
-				  .orElse(null);
-		
-		if(insertedGame == null) {
-			fail("The new historical game must be retrieved");
+		if(historicalGames == null){
+			fail("The method getHistoricalGames() must return a List of Games, not null");
 		}
 	}
+	
 }

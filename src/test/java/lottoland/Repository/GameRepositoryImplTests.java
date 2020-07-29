@@ -148,4 +148,33 @@ public class GameRepositoryImplTests {
 		}
 	}
 	
+	@Test
+	@Order(6)
+	public void addANewHistoricalRecordThenUpdateItThenCheckIfItIsUpdated() {
+		
+		IGame newGame = new Game(TEST_USER_NAME);
+		
+		this.gRepository.addHistoricalGame(newGame);
+		
+		newGame.addMatch(new Match(Constants.SCISSORS_VALUE, Constants.ROCK_VALUE, Constants.WINNER_PLAYER_TWO_ID));
+		
+		this.gRepository.updateHistoricalGame(newGame);
+		
+		List<IGame> historicalGameDB = this.gRepository.getHistoricalGameDB();
+		
+		IGame insertedGame = historicalGameDB.stream()
+				  .filter(game -> newGame.getUser().equals(game.getUser()))
+				  .findAny()
+				  .orElse(null);
+		
+		if(insertedGame == null) {
+			fail("The new historical game must be saved");
+		}
+		
+		assertEquals(insertedGame.getMatches().get(0).getPlayerOneChoose(), Constants.SCISSORS_VALUE, "The player one choose must be: "+ Constants.SCISSORS_VALUE);
+		assertEquals(insertedGame.getMatches().get(0).getPlayerTwoChoose(), Constants.ROCK_VALUE, "The player Two choose must be: "+ Constants.ROCK_VALUE);
+		assertEquals(insertedGame.getMatches().get(0).getWinner(), Constants.WINNER_PLAYER_TWO_ID, "The winner one choose must be: "+ Constants.WINNER_PLAYER_TWO_ID);
+		
+	}
+	
 }
