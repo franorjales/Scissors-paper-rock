@@ -4,7 +4,15 @@
  *
  */
 
-import { PLAY_MATCH, RESTART_GAME, PUT_GAME, PUT_ERROR } from './constants';
+import {
+  PLAY_MATCH,
+  RESTART_GAME,
+  PUT_GAME,
+  PUT_ERROR,
+  PUT_HISTORICAL,
+  GET_HISTORICAL,
+  CHANGE_HISTORICAL_SCREEN_ON,
+} from './constants';
 
 export function playMatchAction(user) {
   return {
@@ -31,5 +39,24 @@ export function putError(error) {
   return {
     type: PUT_ERROR,
     error,
+  };
+}
+
+export function getHistoricalAction() {
+  return {
+    type: GET_HISTORICAL,
+  };
+}
+
+export function putHistorical(historicalGames) {
+  return {
+    type: PUT_HISTORICAL,
+    historicalGames,
+  };
+}
+
+export function changeHistoricalScreenOnAction() {
+  return {
+    type: CHANGE_HISTORICAL_SCREEN_ON,
   };
 }

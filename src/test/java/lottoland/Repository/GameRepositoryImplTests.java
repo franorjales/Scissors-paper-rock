@@ -23,8 +23,6 @@ public class GameRepositoryImplTests {
 	
     private IGameRepository gRepository;
     
-	private static final String TEST_USER_NAME = "TEST_USER_NAME";
-    
 	@BeforeEach
 	public void prepareTests() {
 		this.gRepository = new GameRepositoryImpl();
@@ -155,6 +153,35 @@ public class GameRepositoryImplTests {
 		newGame.addMatch(new Match(Constants.SCISSORS_VALUE, Constants.ROCK_VALUE, Constants.WINNER_PLAYER_TWO_ID));
 		
 		this.gRepository.updateGame(newGame);
+		
+		List<IGame> historicalGameDB = this.gRepository.getHistoricalGames();
+		
+		IGame insertedGame = historicalGameDB.stream()
+				  .filter(game -> newGame.getUser().equals(game.getUser()))
+				  .findAny()
+				  .orElse(null);
+		
+		if(insertedGame == null) {
+			fail("The new historical game must be saved");
+		}
+		
+		assertEquals(insertedGame.getMatches().get(0).getPlayerOneChoose(), Constants.SCISSORS_VALUE, "The player one choose must be: "+ Constants.SCISSORS_VALUE);
+		assertEquals(insertedGame.getMatches().get(0).getPlayerTwoChoose(), Constants.ROCK_VALUE, "The player Two choose must be: "+ Constants.ROCK_VALUE);
+		assertEquals(insertedGame.getMatches().get(0).getWinner(), Constants.WINNER_PLAYER_TWO_ID, "The winner one choose must be: "+ Constants.WINNER_PLAYER_TWO_ID);
+		
+	}
+	
+	@Test
+	@Order(7)
+	public void playANewGameUpdateItAndRestartItThenCheckThatTheHistoricalRemains() {
+		
+		IGame newGame = this.gRepository.addNewGame();
+		
+		newGame.addMatch(new Match(Constants.SCISSORS_VALUE, Constants.ROCK_VALUE, Constants.WINNER_PLAYER_TWO_ID));
+		
+		this.gRepository.updateGame(newGame);
+		
+		this.gRepository.updateGame(new Game(newGame.getUser()));
 		
 		List<IGame> historicalGameDB = this.gRepository.getHistoricalGames();
 		

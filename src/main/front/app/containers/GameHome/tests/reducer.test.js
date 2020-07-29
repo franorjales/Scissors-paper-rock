@@ -1,6 +1,11 @@
 import produce from 'immer';
 import gameHomeReducer from '../reducer';
-import { putError, putGame } from '../actions';
+import {
+  putError,
+  putGame,
+  putHistorical,
+  changeHistoricalScreenOnAction,
+} from '../actions';
 
 /* eslint-disable default-case, no-param-reassign */
 describe('gameHomeReducer', () => {
@@ -15,6 +20,13 @@ describe('gameHomeReducer', () => {
       error: {
         errorStatus: null,
       },
+      historicalGames: {
+        totalRoundsPlayed: 0,
+        totalWinsForPlayerOne: 0,
+        totalWinsForPlayerTwo: 0,
+        totalDraws: 0,
+      },
+      historicalGamesScreenOn: false,
     };
   });
 
@@ -55,17 +67,36 @@ describe('gameHomeReducer', () => {
     expect(gameHomeReducer(state, putGame(input))).toEqual(expectedResult);
   });
 
-  /**
-   * Example state change comparison
-   *
-   * it('should handle the someAction action correctly', () => {
-   *   const expectedResult = produce(state, draft => {
-   *     draft.loading = true;
-   *     draft.error = false;
-   *     draft.userData.nested = false;
-   *   });
-   *
-   *   expect(appReducer(state, someAction())).toEqual(expectedResult);
-   * });
-   */
+  it('should handle PUT_HISTORICAL correctly', () => {
+    const expectedResult = produce(state, draft => {
+      draft.historicalGames = {
+        totalRoundsPlayed: 1,
+        totalWinsForPlayerOne: 1,
+        totalWinsForPlayerTwo: 1,
+        totalDraws: 1,
+      };
+      draft.historicalGamesScreenOn = true;
+    });
+
+    const input = {
+      totalRoundsPlayed: 1,
+      totalWinsForPlayerOne: 1,
+      totalWinsForPlayerTwo: 1,
+      totalDraws: 1,
+    };
+
+    expect(gameHomeReducer(state, putHistorical(input))).toEqual(
+      expectedResult,
+    );
+  });
+
+  it('should handle CHANGE_HISTORICAL_SCREEN_ON correctly', () => {
+    const expectedResult = produce(state, draft => {
+      draft.historicalGamesScreenOn = false;
+    });
+
+    expect(gameHomeReducer(state, changeHistoricalScreenOnAction())).toEqual(
+      expectedResult,
+    );
+  });
 });

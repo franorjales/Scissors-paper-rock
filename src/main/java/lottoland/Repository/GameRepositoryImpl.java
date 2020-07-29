@@ -40,7 +40,9 @@ public class GameRepositoryImpl implements IGameRepository{
 	@Override
 	public void updateGame(IGame game) {
 		this.gameDB = this.gameDB.stream().map((g) -> g.getUser().equals(game.getUser()) ? game : g).collect(Collectors.toList());
-		this.updateHistoricalGame(game);
+		if(game.getNumberOfmatchesPlayeds() > 0) {
+			this.updateHistoricalGame(game);
+		}
 	};
 	
 	@Override

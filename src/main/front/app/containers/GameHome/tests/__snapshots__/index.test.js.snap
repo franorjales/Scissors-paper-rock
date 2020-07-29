@@ -14,7 +14,7 @@ exports[`<GameHome /> should render and match the snapshot 1`] = `
   </div>
   <div
     align="center"
-    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6"
+    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4"
   >
     <button
       class="MuiButtonBase-root MuiButton-root MuiButton-contained"
@@ -33,7 +33,26 @@ exports[`<GameHome /> should render and match the snapshot 1`] = `
   </div>
   <div
     align="center"
-    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6"
+    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4"
+  >
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained"
+      tabindex="0"
+      type="button"
+    >
+      <span
+        class="MuiButton-label"
+      >
+        Access to game history
+      </span>
+      <span
+        class="MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+  <div
+    align="center"
+    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4"
   />
 </div>
 `;

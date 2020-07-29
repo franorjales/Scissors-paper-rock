@@ -4,9 +4,9 @@
 
 /* eslint-disable redux-saga/yield-effects */
 import { put, takeLatest } from 'redux-saga/effects';
-import gameHomeSaga, { playMatch, restartGame } from '../saga';
+import gameHomeSaga, { playMatch, restartGame, getHistorical } from '../saga';
 import { RESTART_GAME, PLAY_MATCH } from '../constants';
-import { putError, putGame } from '../actions';
+import { putError, putGame, putHistorical } from '../actions';
 
 const action = { user: 'testUserName' };
 
@@ -60,6 +60,34 @@ describe('restartGame Saga', () => {
   it('should call the putError action if the response errors', () => {
     const response = new Error('Some error');
     const putDescriptor = getRestartGameGenerator.throw(response).value;
+    expect(putDescriptor).toEqual(put(putError(response)));
+  });
+});
+
+describe('getHistorical Saga', () => {
+  let getHistoricalGenerator;
+
+  beforeEach(() => {
+    getHistoricalGenerator = getHistorical(action);
+
+    const callDescriptor = getHistoricalGenerator.next(action).value;
+    expect(callDescriptor).toMatchSnapshot();
+  });
+
+  it('should dispatch the putGame action if it requests the data successfully', () => {
+    const response = {
+      totalRoundsPlayed: 1,
+      totalWinsForPlayerOne: 1,
+      totalWinsForPlayerTwo: 1,
+      totalDraws: 1,
+    };
+    const putDescriptor = getHistoricalGenerator.next(response).value;
+    expect(putDescriptor).toEqual(put(putHistorical(response)));
+  });
+
+  it('should call the putError action if the response errors', () => {
+    const response = new Error('Some error');
+    const putDescriptor = getHistoricalGenerator.throw(response).value;
     expect(putDescriptor).toEqual(put(putError(response)));
   });
 });

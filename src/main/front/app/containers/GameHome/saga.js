@@ -1,7 +1,7 @@
 import { takeLatest, call, put } from 'redux-saga/effects';
 import request from '../../utils/request';
-import { PLAY_MATCH, RESTART_GAME } from './constants';
-import { putGame, putError } from './actions';
+import { PLAY_MATCH, RESTART_GAME, GET_HISTORICAL } from './constants';
+import { putGame, putError, putHistorical } from './actions';
 
 export function* playMatch(action) {
   const { user } = action;
@@ -23,8 +23,18 @@ export function* restartGame(action) {
   }
 }
 
+export function* getHistorical() {
+  try {
+    const historicalGames = yield call(request, `/api/getHistoricalGames`);
+    yield put(putHistorical(historicalGames));
+  } catch (error) {
+    yield put(putError(error));
+  }
+}
+
 // Individual exports for testing
 export default function* gameHomeSaga() {
   yield takeLatest(PLAY_MATCH, playMatch);
   yield takeLatest(RESTART_GAME, restartGame);
+  yield takeLatest(GET_HISTORICAL, getHistorical);
 }

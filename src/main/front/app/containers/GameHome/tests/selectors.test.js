@@ -11,6 +11,13 @@ describe('selectGameHomeDomain', () => {
       error: {
         errorStatus: null,
       },
+      historicalGames: {
+        totalRoundsPlayed: 0,
+        totalWinsForPlayerOne: 0,
+        totalWinsForPlayerTwo: 0,
+        totalDraws: 0,
+      },
+      historicalGamesScreenOn: false,
     };
     const mockedState = {
       home: gameHomeState,

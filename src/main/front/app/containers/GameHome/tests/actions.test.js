@@ -3,8 +3,19 @@ import {
   putGame,
   restartGameAction,
   playMatchAction,
+  changeHistoricalScreenOnAction,
+  putHistorical,
+  getHistoricalAction,
 } from '../actions';
-import { PUT_ERROR, PUT_GAME, RESTART_GAME, PLAY_MATCH } from '../constants';
+import {
+  PUT_ERROR,
+  PUT_GAME,
+  RESTART_GAME,
+  PLAY_MATCH,
+  GET_HISTORICAL,
+  PUT_HISTORICAL,
+  CHANGE_HISTORICAL_SCREEN_ON,
+} from '../constants';
 
 describe('GameHome actions', () => {
   describe('PUT_ERROR Action', () => {
@@ -68,6 +79,49 @@ describe('GameHome actions', () => {
       const input = 'username';
 
       expect(playMatchAction(input)).toEqual(expected);
+    });
+  });
+
+  describe('PUT_HISTORICAL Action', () => {
+    it('has a type of PUT_HISTORICAL', () => {
+      const expected = {
+        type: PUT_HISTORICAL,
+        historicalGames: {
+          totalRoundsPlayed: 0,
+          totalWinsForPlayerOne: 0,
+          totalWinsForPlayerTwo: 0,
+          totalDraws: 0,
+        },
+      };
+
+      const input = {
+        totalRoundsPlayed: 0,
+        totalWinsForPlayerOne: 0,
+        totalWinsForPlayerTwo: 0,
+        totalDraws: 0,
+      };
+
+      expect(putHistorical(input)).toEqual(expected);
+    });
+  });
+
+  describe('GET_HISTORICAL Action', () => {
+    it('has a type of GET_HISTORICAL', () => {
+      const expected = {
+        type: GET_HISTORICAL,
+      };
+
+      expect(getHistoricalAction()).toEqual(expected);
+    });
+  });
+
+  describe('CHANGE_HISTORICAL_SCREEN_ON Action', () => {
+    it('has a type of CHANGE_HISTORICAL_SCREEN_ON', () => {
+      const expected = {
+        type: CHANGE_HISTORICAL_SCREEN_ON,
+      };
+
+      expect(changeHistoricalScreenOnAction()).toEqual(expected);
     });
   });
 });
