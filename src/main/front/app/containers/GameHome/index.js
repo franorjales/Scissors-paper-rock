@@ -76,12 +76,7 @@ export function GameHome({
         {gameHome.historicalGames.totalDraws}
       </Grid>
       <Grid item xs={12} align="center">
-        <Button
-          variant="contained"
-          onClick={() => {
-            returnToPlayScreen();
-          }}
-        >
+        <Button variant="contained" onClick={returnToPlayScreen}>
           Return to play the game again
         </Button>
       </Grid>
@@ -103,21 +98,7 @@ export function GameHome({
                   <TableCell>Winner</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
-                {gameHome.game.matches.map(row => (
-                  <TableRow key={row.playerOneChoose}>
-                    <TableCell component="th" scope="row">
-                      {matchValueWithStringForChooses(row.playerOneChoose)}
-                    </TableCell>
-                    <TableCell>
-                      {matchValueWithStringForChooses(row.playerTwoChoose)}
-                    </TableCell>
-                    <TableCell>
-                      {matchValueWithStringForWinner(row.winner)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+              <TableBody>{generateRows(gameHome.game.matches)}</TableBody>
             </Table>
           </TableContainer>
           <Grid item xs={12} align="center">
@@ -131,6 +112,7 @@ export function GameHome({
       )}
       <Grid item xs={4} align="center">
         <Button
+          id="play-button"
           variant="contained"
           onClick={() => {
             playMatch(gameHome.game.user);
@@ -140,12 +122,7 @@ export function GameHome({
         </Button>
       </Grid>
       <Grid item xs={4} align="center">
-        <Button
-          variant="contained"
-          onClick={() => {
-            getHistorical();
-          }}
-        >
+        <Button variant="contained" onClick={getHistorical}>
           Access to game history
         </Button>
       </Grid>
@@ -154,6 +131,7 @@ export function GameHome({
           undefined
         ) : (
           <Button
+            id="restart-button"
             variant="contained"
             onClick={() => {
               restartGame(gameHome.game.user);
@@ -166,6 +144,19 @@ export function GameHome({
     </Grid>
   );
 }
+
+export const generateRows = matches =>
+  matches.map(row => (
+    <TableRow key={row.playerOneChoose}>
+      <TableCell component="th" scope="row">
+        {matchValueWithStringForChooses(row.playerOneChoose)}
+      </TableCell>
+      <TableCell>
+        {matchValueWithStringForChooses(row.playerTwoChoose)}
+      </TableCell>
+      <TableCell>{matchValueWithStringForWinner(row.winner)}</TableCell>
+    </TableRow>
+  ));
 
 GameHome.propTypes = {
   playMatch: PropTypes.func,

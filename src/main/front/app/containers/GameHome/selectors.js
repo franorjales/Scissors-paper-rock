@@ -4,21 +4,16 @@ import { initialState } from './reducer';
 /**
  * Direct selector to the gameHome state domain
  */
-
 const selectGameHomeDomain = state => state.gameHome || initialState;
-
-/**
- * Other specific selectors
- */
 
 /**
  * Default selector used by GameHome
  */
 
-export const makeSelectGameHome = () =>
+const makeSelectGameHome = () =>
   createSelector(
     selectGameHomeDomain,
-    substate => substate,
+    state => state,
   );
 
 export default makeSelectGameHome;

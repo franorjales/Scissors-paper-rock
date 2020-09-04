@@ -18,6 +18,7 @@ exports[`<GameHome /> should render and match the snapshot 1`] = `
   >
     <button
       class="MuiButtonBase-root MuiButton-root MuiButton-contained"
+      id="play-button"
       tabindex="0"
       type="button"
     >
@@ -54,5 +55,79 @@ exports[`<GameHome /> should render and match the snapshot 1`] = `
     align="center"
     class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4"
   />
+</div>
+`;
+
+exports[`<GameHome /> should render and match the snapshot 2`] = `
+<div
+  class="MuiGrid-root makeStyles-root-5 MuiGrid-container"
+>
+  <div
+    align="center"
+    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12"
+  >
+    <h1>
+      Hello! Do you want to play a game?
+    </h1>
+  </div>
+  <div
+    align="center"
+    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4"
+  >
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained"
+      id="play-button"
+      tabindex="0"
+      type="button"
+    >
+      <span
+        class="MuiButton-label"
+      >
+        Play one Match!
+      </span>
+      <span
+        class="MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+  <div
+    align="center"
+    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4"
+  >
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained"
+      tabindex="0"
+      type="button"
+    >
+      <span
+        class="MuiButton-label"
+      >
+        Access to game history
+      </span>
+      <span
+        class="MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+  <div
+    align="center"
+    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4"
+  >
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained"
+      id="restart-button"
+      tabindex="0"
+      type="button"
+    >
+      <span
+        class="MuiButton-label"
+      >
+        Restart the game
+      </span>
+      <span
+        class="MuiTouchRipple-root"
+      />
+    </button>
+  </div>
 </div>
 `;
