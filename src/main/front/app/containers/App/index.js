@@ -20,7 +20,6 @@ export default function App() {
     <div>
       <Switch>
         <Route exact path="/" component={GameHome} />
-        <Route component={NotFoundPage} />
       </Switch>
       <GlobalStyle />
     </div>

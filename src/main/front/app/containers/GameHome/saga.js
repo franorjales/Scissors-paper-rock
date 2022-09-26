@@ -6,7 +6,7 @@ import { putGame, putError, putHistorical } from './actions';
 export function* playMatch(action) {
   const { user } = action;
   try {
-    const game = yield call(request, `/api/playMatch?user=${user}`);
+    const game = yield call(request, `http://localhost:8080/api/playMatch?user=${user}`);
     yield put(putGame(game));
   } catch (error) {
     yield put(putError(error));
@@ -16,7 +16,7 @@ export function* playMatch(action) {
 export function* restartGame(action) {
   const { user } = action;
   try {
-    const game = yield call(request, `/api/restartGame?user=${user}`);
+    const game = yield call(request, `http://localhost:8080/api/restartGame?user=${user}`);
     yield put(putGame(game));
   } catch (error) {
     yield put(putError(error));
@@ -25,7 +25,7 @@ export function* restartGame(action) {
 
 export function* getHistorical() {
   try {
-    const historicalGames = yield call(request, `/api/getHistoricalGames`);
+    const historicalGames = yield call(request, `http://localhost:8080/api/getHistoricalGames`);
     yield put(putHistorical(historicalGames));
   } catch (error) {
     yield put(putError(error));
