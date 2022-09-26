@@ -6,7 +6,7 @@ Object {
   "combinator": false,
   "payload": Object {
     "args": Array [
-      "/api/getHistoricalGames",
+      "http://localhost:8080/api/getHistoricalGames",
     ],
     "context": null,
     "fn": [Function],
@@ -21,7 +21,7 @@ Object {
   "combinator": false,
   "payload": Object {
     "args": Array [
-      "/api/getHistoricalGames",
+      "http://localhost:8080/api/getHistoricalGames",
     ],
     "context": null,
     "fn": [Function],
@@ -36,7 +36,7 @@ Object {
   "combinator": false,
   "payload": Object {
     "args": Array [
-      "/api/playMatch?user=testUserName",
+      "http://localhost:8080/api/playMatch?user=testUserName",
     ],
     "context": null,
     "fn": [Function],
@@ -51,7 +51,7 @@ Object {
   "combinator": false,
   "payload": Object {
     "args": Array [
-      "/api/playMatch?user=testUserName",
+      "http://localhost:8080/api/playMatch?user=testUserName",
     ],
     "context": null,
     "fn": [Function],
@@ -66,7 +66,7 @@ Object {
   "combinator": false,
   "payload": Object {
     "args": Array [
-      "/api/restartGame?user=testUserName",
+      "http://localhost:8080/api/restartGame?user=testUserName",
     ],
     "context": null,
     "fn": [Function],
@@ -81,7 +81,7 @@ Object {
   "combinator": false,
   "payload": Object {
     "args": Array [
-      "/api/restartGame?user=testUserName",
+      "http://localhost:8080/api/restartGame?user=testUserName",
     ],
     "context": null,
     "fn": [Function],

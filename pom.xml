@@ -133,7 +133,6 @@
 								</goals>
 								<phase>generate-resources</phase>
 							</execution>
-
 							<execution>
 								<id>npm-install</id>
 								<goals>
@@ -143,7 +142,16 @@
 									<arguments>install</arguments>
 								</configuration>
 							</execution>
-
+							<execution>
+								<id>test-frontend</id>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<phase>prepare-package</phase>
+								<configuration>
+									<arguments>run test</arguments>
+								</configuration>
+							</execution>
 							<execution>
 								<id>build-frontend</id>
 								<goals>
